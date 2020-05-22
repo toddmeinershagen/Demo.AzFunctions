@@ -52,14 +52,17 @@ namespace Demo.AzFunctions
         public static async Task Handle1(
             [TimerTrigger("0 */15 * * * *")] TimerInfo timer)
         {
-            using (var connection = new SqlConnection(Configuration["connection-string"]))
+            if (Convert.ToBoolean(Configuration["keep-db-alive"]))
             {
-                connection.Open();
-                using (var command = connection.CreateCommand())
+                using (var connection = new SqlConnection(Configuration["connection-string"]))
                 {
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = "SELECT 1";
-                    var result = (int)await command.ExecuteScalarAsync().ConfigureAwait(false);
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.CommandText = "SELECT 1";
+                        var result = (int)await command.ExecuteScalarAsync().ConfigureAwait(false);
+                    }
                 }
             }
         }
