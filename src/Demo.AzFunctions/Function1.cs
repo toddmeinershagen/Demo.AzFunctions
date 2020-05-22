@@ -50,10 +50,12 @@ namespace Demo.AzFunctions
 
         [FunctionName("TimerTriggeredFunction1")]
         public static async Task Handle1(
-            [TimerTrigger("0 */15 * * * *")] TimerInfo timer)
+            [TimerTrigger("*/15 7-18 * * *")] TimerInfo timer, ILogger logger)
         {
             if (Convert.ToBoolean(Configuration["keep-db-alive"]))
             {
+                logger.LogTrace("Executing logic to keep the db alive.");
+
                 using (var connection = new SqlConnection(Configuration["connection-string"]))
                 {
                     connection.Open();
